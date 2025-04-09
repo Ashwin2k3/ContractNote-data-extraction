@@ -15,10 +15,20 @@ app = FastAPI(title="PDF Table Extractor API")
 UPLOAD_DIR = Path("uploads")
 UPLOAD_DIR.mkdir(exist_ok=True)
 
+# def extract_tables_from_pdf(pdf_path):
+#     # Use Camelot to extract tables
+#     tables = camelot.read_pdf(str(pdf_path), pages='all', flavor='lattice')
+#     return tables
 def extract_tables_from_pdf(pdf_path):
-    # Use Camelot to extract tables
-    tables = camelot.read_pdf(str(pdf_path), pages='all', flavor='lattice')
+    try:
+        tables = camelot.read_pdf(str(pdf_path), pages='all', flavor='lattice')
+        if tables.n == 0:
+            raise ValueError("No tables found with lattice.")
+    except Exception:
+        tables = camelot.read_pdf(str(pdf_path), pages='all', flavor='stream')
     return tables
+
+
 
 def process_table_data(tables, filename):
     all_rows = []
